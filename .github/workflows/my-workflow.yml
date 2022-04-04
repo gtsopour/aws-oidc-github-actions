@@ -7,7 +7,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    run:
+    steps:
       - name: Auth with AWS
         run: |
           export AWS_ROLE_ARN=arn:aws:iam::012345678910:role/YourIAMRole
@@ -19,14 +19,14 @@ jobs:
           echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
 
           curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-          
+
           apt-get install awscli
-          
+
           temp_role=$(aws sts assume-role-with-web-identity \
           --web-identity-token file://$AWS_WEB_IDENTITY_TOKEN_FILE \
           --role-arn "arn:aws:iam::<aws_account_number>:role/<role_name>" \
           --role-session-name "<some_session_name>")
-          
+
           export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq -r .Credentials.AccessKeyId) >> GITHUB_ENV
           echo "::add-mask::$AWS_ACCESS_KEY_ID"
           export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq -r .Credentials.SecretAccessKey) >> $GITHUB_ENV
