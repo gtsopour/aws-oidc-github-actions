@@ -4,10 +4,10 @@ on:
 env:
   AWS_REGION : "eu-central-1" 
 permissions:
-      id-token: write
-      contents: read
+  id-token: write
+  contents: read
 jobs:
-  S3PackageUpload:
+  AWSAuth:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -15,7 +15,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ env.ROLE_ARN }}
+          role-to-assume: ${{ secrets.ROLE_ARN }}
           role-session-name: samplerolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Get Caller Identity
