@@ -1,24 +1,23 @@
-name: my-workflow
+name: AWS example workflow
 on:
-  push: {}
-jobs:
-  deploy:
-    name: Auth with AWS
-    runs-on: ubuntu-latest
-    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
-    permissions:
+  push
+env:
+  AWS_REGION : "eu-central-1" 
+permissions:
       id-token: write
       contents: read
+jobs:
+  S3PackageUpload:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: $ROLE_ARN
-        aws-region: eu-central-1
-
-    - name: Get Caller Identity
-      run: |
-        aws sts get-caller-identity
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          role-session-name: samplerolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Get Caller Identity
+        run: |
+          aws sts get-caller-identity
